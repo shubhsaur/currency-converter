@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Dropdown from './Dropdown';
 import { HiMiniArrowsRightLeft } from "react-icons/hi2";
 
@@ -6,9 +6,10 @@ const CurrencyConverter = () => {
     const [currencies, setCurrencies] = useState([]);
     const [currencyFrom, setCurrencyFrom] = useState("USD");
     const [currencyTo, setCurrencyTo] = useState("INR");
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState(null);
     const [convertedAmount, setConvertedAmount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const fetchCurrencies = async () => {
         const res = await fetch('https://api.frankfurter.app/currencies');
@@ -18,6 +19,10 @@ const CurrencyConverter = () => {
     }
 
     const getConvertedCurrency = async () => {
+        if(!amount){
+            setErrorMessage("Please provide a valid amount");
+            return;
+        }
         setIsLoading(true);
         const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${currencyFrom}&to=${currencyTo}`);
         const data = await res.json();
@@ -29,6 +34,16 @@ const CurrencyConverter = () => {
     const handleSwap = () => {
         setCurrencyFrom(currencyTo);
         setCurrencyTo(currencyFrom);
+    }
+
+    const handleAmountChange = (e, amount) => {
+        if(amount > 0){
+            setErrorMessage("");
+            
+        }else{
+            setErrorMessage("Please provide a valid amount");
+        }
+        setAmount(e.target.value);
     }
 
     useEffect(() => {
@@ -68,7 +83,8 @@ const CurrencyConverter = () => {
             </div>
             <div className='self-end'>
                 <label htmlFor="amount" className='text-[#073b4c]'>Amount: </label>
-                <input className='appearance-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-gray-400' placeholder='Enter Amount' type="number" id='amount' onChange={(e) => setAmount(e.target.value)} value={amount} />
+                <input className='appearance-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-gray-400' placeholder='Enter Amount' type="number" id='amount' pattern="[0-9]*" onChange={(e) => handleAmountChange(e, amount)} value={amount} required />
+                {errorMessage && <p className='text-red-600 text-sm font-normal'>{errorMessage}</p>}
             </div>
             <div className='self-end mt-4' onClick={getConvertedCurrency}>
                 <button className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-[#012F73] to-[#FF1D7D] group-hover:from-[#012F73] group-hover:to-[#FF1D7D] hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-[#012F73] dark:focus:ring-[#FF1D7D]">
