@@ -1,17 +1,20 @@
 import React from 'react'
+import { Dropdown } from 'primereact/dropdown';
+        
 
-const Dropdown = ({ currencies, title, currency, setCurrency }) => {
+const DropDown = ({ currencies, title, currency, setCurrency }) => {
 
   return (
     <div>
-        <label htmlFor="currency" className='text-[#073b4c]'>{title}</label>
-        <select className='appearance-auto' name="currency" id="currency" value={currency} onChange={(e) => setCurrency(e.target.value)}>
-        {currencies && currencies.map(curr => (
-            <option key={curr} value={curr}>{curr}</option>
-        ))}
-        </select>
+        <Dropdown 
+          name='dropdown'
+          placeholder={title}
+          options={currencies}
+          onChange={(e) => setCurrency(e.target.value)}
+          value={currency}
+        />
     </div>
   )
 }
 
-export default Dropdown
+export default DropDown
